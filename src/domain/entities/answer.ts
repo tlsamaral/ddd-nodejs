@@ -3,11 +3,8 @@ interface AnswerProps {
   content: string
 }
 
-export class Answer extends Entity {
-  public content: string
-
-  constructor(props: AnswerProps, id?: string) {
-    super(id)
-    this.content = props.content
+export class Answer extends Entity<AnswerProps> {
+  get content() {
+    return this.props.content
   }
 }
