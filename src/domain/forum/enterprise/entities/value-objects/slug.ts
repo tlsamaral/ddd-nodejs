@@ -1,5 +1,9 @@
 export class Slug {
-  constructor(public value: string) {}
+  private constructor(public value: string) {}
+
+  static create(value: string) {
+    return new Slug(value)
+  }
 
   /**
    * Receives a string and normalize it as a slug
