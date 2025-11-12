@@ -1,36 +1,42 @@
+import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository'
 import { makeAnswer } from 'test/factories/make-answer'
 import { InMemoryAnswerCommentsRepository } from 'test/repositories/in-memory-answer-comments-repository'
-import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-repository'
-import { CommentOnAnswerUseCase } from './comment-on-answer'
+import { CommentOnAnswerUseCase } from '@/domain/forum/application/use-cases/comment-on-answer'
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository'
 
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository
 let inMemoryAnswersRepository: InMemoryAnswersRepository
 let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository
 let sut: CommentOnAnswerUseCase
 
 describe('Comment on Answer', () => {
   beforeEach(() => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository()
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository,
+    )
     inMemoryAnswerCommentsRepository = new InMemoryAnswerCommentsRepository()
+
     sut = new CommentOnAnswerUseCase(
       inMemoryAnswersRepository,
       inMemoryAnswerCommentsRepository,
     )
   })
 
-  // sut = system under test
-
   it('should be able to comment on answer', async () => {
-    const newAnswer = makeAnswer()
-    await inMemoryAnswersRepository.create(newAnswer)
+    const answer = makeAnswer()
+
+    await inMemoryAnswersRepository.create(answer)
 
     await sut.execute({
-      answerId: newAnswer.id.toString(),
-      authorId: newAnswer.authorId.toString(),
-      content: 'Comentario teste',
+      answerId: answer.id.toString(),
+      authorId: answer.authorId.toString(),
+      content: 'Comentário teste',
     })
 
     expect(inMemoryAnswerCommentsRepository.items[0].content).toEqual(
-      'Comentario teste',
+      'Comentário teste',
     )
   })
 })
