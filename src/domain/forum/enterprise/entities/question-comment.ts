@@ -1,9 +1,10 @@
-import type { UniqueEntityId } from '@/core/entities/unique-entity-id'
+import type { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import type { Optional } from '@/core/types/optional'
+import { NewQuestionCommentEvent } from '../events/new-question-comment'
 import { Comment, type CommentProps } from './comment'
 
 export interface QuestionCommentProps extends CommentProps {
-  questionId: UniqueEntityId
+  questionId: UniqueEntityID
 }
 
 export class QuestionComment extends Comment<QuestionCommentProps> {
@@ -12,7 +13,7 @@ export class QuestionComment extends Comment<QuestionCommentProps> {
   }
   static create(
     props: Optional<QuestionCommentProps, 'createdAt'>,
-    id?: UniqueEntityId,
+    id?: UniqueEntityID,
   ) {
     const questionComment = new QuestionComment(
       {
@@ -21,6 +22,14 @@ export class QuestionComment extends Comment<QuestionCommentProps> {
       },
       id,
     )
+
+    const isNewQuestionComment = !id
+
+    if (isNewQuestionComment) {
+      questionComment.addDomainEvent(
+        new NewQuestionCommentEvent(questionComment),
+      )
+    }
 
     return questionComment
   }
